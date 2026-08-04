@@ -13,7 +13,7 @@
 
 - [x] Solved cold (no hints)
 - [ ] Solved with hints — stage reached: `10min stuck` / `Hint 1` / `Hint 2` / `Topic tag` / `Editorial title` / `Editorial intuition` / `Full solution`
-- [ ] Recognized the pattern immediately but implementation was slow
+- [x] Recognized the pattern immediately but implementation was slow
 - [x] Knew the pattern, execution had bugs
 - Time to first working solution: 10:00
 
@@ -33,6 +33,7 @@ Simply: `int temp_max = std::max({num, local_max * num, local_min * num});` or e
 
 ## What I'd do differently next time
 - Make solution more readable by applying max and min with more values (I didn't know you could do that by turning into an array)
+
 
 ## Review status
 

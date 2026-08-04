@@ -40,6 +40,7 @@
 // 
  
 
+#include <deque>
 #if __has_include("leetcode.hpp")
 #include "leetcode.hpp"
 #endif
@@ -50,6 +51,20 @@ public:
 
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
         vector<int> solution{};
+
+        // Stores indices such that front always has the largest index
+        // Indices pruned from the front if expired ie i - stored_index > k
+        // Pop elements from the back until the leftover elements are greater than the new number as these can no longer be a maximum
+        deque<int> indices{};
+       
+        for (int i=0; i<static_cast<int>(nums.size()); ++i) {
+            // Prune indices
+            while (!indices.empty() && i - indices.front() >= k) indices.pop_front();
+            while (!indices.empty() && nums[indices.back()] <= nums[i]) indices.pop_back();
+            
+            indices.push_back(i);
+            if (i > k - 2) solution.push_back(nums[indices.front()]);
+        }
         
         return solution;
     }

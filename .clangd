@@ -4,3 +4,4 @@ CompileFlags:
     - -Wall
     - -Wextra
     - -I.
+  CompilationDatabase: build/

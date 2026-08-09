@@ -1,3 +1,9 @@
+#if __has_include("leetcode.hpp")
+#include "leetcode.hpp"
+#elif __has_include("../leetcode.hpp")
+#include "../leetcode.hpp"
+#endif
+
 // Category: algorithms
 // Level: Medium
 // Percent: 36.786%
@@ -36,9 +42,6 @@
  
 
 #include <iostream>
-#if __has_include("leetcode.hpp")
-#include "leetcode.hpp"
-#endif
 
 class Solution {
 public:

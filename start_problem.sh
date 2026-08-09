@@ -54,40 +54,23 @@ import sys
 
 problem_dir = Path(sys.argv[1])
 
+HEADER_BLOCK = """#if __has_include("leetcode.hpp")
+#include "leetcode.hpp"
+#elif __has_include("../leetcode.hpp")
+#include "../leetcode.hpp"
+#endif"""
+
 for path in problem_dir.glob("*.cpp"):
     original = path.read_text(encoding="utf-8")
 
-    if "__has_include(\"leetcode.hpp\")" in original:
-        continue
-
-    if '#include "../../leetcode.hpp"' in original:
-        updated = original.replace(
-            '#include "../../leetcode.hpp"',
-            '#if __has_include("leetcode.hpp")\n#include "leetcode.hpp"\n#endif',
-        )
-    elif '#include "leetcode.hpp"' in original:
-        updated = original.replace(
-            '#include "leetcode.hpp"',
-            '#if __has_include("leetcode.hpp")\n#include "leetcode.hpp"\n#endif',
-        )
-    else:
+    # If header guard block is missing or old, normalize it
+    if '#include "leetcode.hpp"' in original or '__has_include' in original:
+        # Strip existing leetcode include blocks
         lines = original.splitlines()
-        insert_at = 0
-        while insert_at < len(lines) and (
-            not lines[insert_at].strip() or lines[insert_at].lstrip().startswith("//")
-        ):
-            insert_at += 1
-
-        prefix = [
-            '#if __has_include("leetcode.hpp")',
-            '#include "leetcode.hpp"',
-            '#endif',
-            '',
-        ]
-        updated_lines = lines[:insert_at] + prefix + lines[insert_at:]
-        updated = "\n".join(updated_lines)
-        if original.endswith("\n"):
-            updated += "\n"
+        filtered = [l for l in lines if not ('leetcode.hpp' in l or '#if __has_include' in l or '#elif __has_include' in l or '#endif' in l and 'leetcode' in original)]
+        updated = HEADER_BLOCK + "\n\n" + "\n".join(filtered).lstrip()
+    else:
+        updated = HEADER_BLOCK + "\n\n" + original
 
     updated = updated.replace('#include <stdio>', '#include <cstdio>')
     path.write_text(updated, encoding="utf-8")

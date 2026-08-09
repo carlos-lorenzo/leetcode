@@ -1,3 +1,9 @@
+#if __has_include("leetcode.hpp")
+#include "leetcode.hpp"
+#elif __has_include("../leetcode.hpp")
+#include "../leetcode.hpp"
+#endif
+
 // Category: algorithms
 // Level: Hard
 // Percent: 49.047234%
@@ -41,9 +47,6 @@
  
 
 #include <deque>
-#if __has_include("leetcode.hpp")
-#include "leetcode.hpp"
-#endif
 
 class Solution {
 public:

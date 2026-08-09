@@ -1,3 +1,9 @@
+#if __has_include("leetcode.hpp")
+#include "leetcode.hpp"
+#elif __has_include("../leetcode.hpp")
+#include "../leetcode.hpp"
+#endif
+
 // Category: algorithms
 // Level: Medium
 // Percent: 53.655296%
@@ -40,9 +46,6 @@
 // Follow up: If you have figured out the O(n) solution, try coding another solution using the divide and conquer approach, which is more subtle.
  
 
-#if __has_include("leetcode.hpp")
-#include "leetcode.hpp"
-#endif
 
 class Solution {
 public:

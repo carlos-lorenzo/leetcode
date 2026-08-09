@@ -10,9 +10,6 @@ fi
 workspace_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 problem_id="$1"
 problem_dir="$workspace_dir/$problem_id"
-solution_glob="$problem_dir/$problem_id"*.cpp
-
-action="test"
 
 if [[ ! -d "$problem_dir" ]]; then
 	echo "Problem directory '$problem_dir' does not exist" >&2
@@ -37,18 +34,7 @@ if [[ -z "$test_data_path" ]]; then
 	exit 1
 fi
 
-shopt -s nullglob
-solution_files=($solution_glob)
-shopt -u nullglob
-
-if [[ ${#solution_files[@]} -eq 0 ]]; then
-	echo "No solution file found matching $solution_glob" >&2
-	exit 1
-fi
-
-cd "$problem_dir"
-
-python3 - "$problem_id" "$test_data_path" <<'PY'
+python3 - "$problem_id" "$problem_dir" "$test_data_path" <<'PY'
 from pathlib import Path
 import os
 import re
@@ -58,11 +44,21 @@ import tempfile
 import textwrap
 
 problem_id = sys.argv[1]
-input_path = Path(sys.argv[2])
-workspace_root = Path.cwd()
-solution_path = next(workspace_root.glob(f'{problem_id}*.cpp'))
+problem_dir = Path(sys.argv[2]).resolve()
+input_path = Path(sys.argv[3]).resolve()
+workspace_root = problem_dir.parent.resolve()
 
-# Read all lines from the test data file
+# Look inside the problem directory first, then fall back to root workspace
+solution_files = list(problem_dir.glob('*.cpp'))
+if not solution_files:
+	solution_files = list(workspace_root.glob(f'{problem_id}*.cpp'))
+
+if not solution_files:
+	raise SystemExit(f'No solution .cpp file found in {problem_dir} or {workspace_root}')
+
+solution_path = solution_files[0]
+
+# Read test data lines
 lines = []
 for raw in input_path.read_text(encoding='utf-8').splitlines():
 	line = raw.strip()
@@ -72,14 +68,14 @@ for raw in input_path.read_text(encoding='utf-8').splitlines():
 if not lines:
 	raise SystemExit(f'No test cases found in {input_path}')
 
-# Extract the Solution class body
+# Extract Solution class
 source = solution_path.read_text(encoding='utf-8')
 class_match = re.search(r'class\s+Solution\s*\{(?P<body>.*?)\};', source, re.S)
 if not class_match:
 	raise SystemExit(f'Could not find a Solution class in {solution_path}')
 body = class_match.group('body')
 
-# Find all possible methods
+# Parse method candidates
 candidates = []
 for match in re.finditer(r'(?P<return>[A-Za-z_][A-Za-z0-9_:<>\*\&\s]*?)\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*\((?P<params>[^)]*)\)\s*\{', body, re.S):
 	name = match.group('name')
@@ -96,7 +92,6 @@ method_match = None
 parsed_params = []
 method_name = ""
 
-# Smart method selection
 for candidate in candidates:
 	raw_params = [param.strip() for param in candidate.group('params').split(',') if param.strip()]
 	if not raw_params or not raw_params[0]:
@@ -132,7 +127,8 @@ for candidate in candidates:
 		p_info = current_parsed[p_idx]
 		
 		is_array = sample.startswith('[')
-		expects_array = 'vector' in p_info['type'].lower()
+		type_lower = p_info['type'].lower()
+		expects_array = ('vector' in type_lower) or ('treenode' in type_lower) or ('listnode' in type_lower)
 		
 		if expects_array and not is_array:
 			match_heuristic = False
@@ -157,24 +153,26 @@ with tempfile.TemporaryDirectory(dir=str(workspace_root)) as tmpdir:
 	harness_path = tmpdir_path / 'main.cpp'
 
 	for idx, case_args in enumerate(cases, start=1):
-		
 		declarations = []
 		call_args = []
 		
 		for p_idx, arg_val in enumerate(case_args):
 			p_info = parsed_params[p_idx]
+			p_type_lower = p_info['type'].lower()
 			
-			payload = arg_val
-			if payload.startswith('['):
-				payload = payload.replace('[', '{').replace(']', '}')
-				
-			declarations.append(f"{p_info['type']} {p_info['name']} = {payload};")
+			if 'treenode' in p_type_lower:
+				declarations.append(f'{p_info["type"]} {p_info["name"]} = stringToTreeNode("{arg_val}");')
+			elif arg_val.startswith('['):
+				payload = arg_val.replace('[', '{').replace(']', '}')
+				declarations.append(f'{p_info["type"]} {p_info["name"]} = {payload};')
+			else:
+				declarations.append(f'{p_info["type"]} {p_info["name"]} = {arg_val};')
+
 			call_args.append(p_info['name'])
 			
 		decls_str = '\n\t\t\t\t'.join(declarations)
 		call_args_str = ', '.join(call_args)
 		
-		# Generate the C++ code with namespace inclusion and vector printer
 		harness_path.write_text(textwrap.dedent(f'''
 			#include <iostream>
 			#include <vector>
@@ -182,10 +180,11 @@ with tempfile.TemporaryDirectory(dir=str(workspace_root)) as tmpdir:
 			#include <cstdlib>
 			#include <cstdio>
 			#include <algorithm>
+			#include <queue>
+			#include <sstream>
 
 			using namespace std;
 
-			// Universal vector printer
 			template <typename T>
 			ostream& operator<<(ostream& os, const vector<T>& v) {{
 				os << "[";
@@ -214,7 +213,7 @@ with tempfile.TemporaryDirectory(dir=str(workspace_root)) as tmpdir:
 
 		binary_path = tmpdir_path / f'case_{idx}'
 		subprocess.run([
-			'g++', '-std=c++23', '-Wall', '-Wextra', '-pedantic', str(harness_path), '-o', str(binary_path)
+			'g++', '-std=c++23', '-Wall', '-Wextra', '-pedantic', f'-I{workspace_root}', str(harness_path), '-o', str(binary_path)
 		], check=True, cwd=str(workspace_root))
 		
 		completed = subprocess.run([str(binary_path)], check=False, cwd=str(workspace_root), capture_output=True, text=True)

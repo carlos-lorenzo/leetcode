@@ -23,24 +23,19 @@
 
 ## Complexity
 
-- Time: `O(n)`
+- Time: `O(n^2)`
 - Space: `O(n)`
 
 ## What I missed / got wrong
-
-<Be specific: wrong initial data structure, missed an edge case, misjudged complexity,
-froze on the observation step, clean logic but slow typing, etc. This is the line that
-actually earns you something on review — vague notes here are wasted effort.>
+- I knew the optimal solution used kadane but didnt know how to integrate it
+- Use bottom up to avoid redundant work
 
 ## What I'd do differently next time
-
-<One or two concrete adjustments — a trigger phrase to add to Recognition Triggers,
-a variant to add to the Pattern Catalog, a habit to change (e.g. "write the invariant
-down before coding").>
+- 
 
 ## Review status
 
-- [ ] `todo-review` — could not solve cold on first pass, revisit next review round
+- [x] `todo-review` — could not solve cold on first pass, revisit next review round
 - [ ] Reviewed on <date> — resolved without hints, tag removed
 - [ ] Reviewed on <date> — still shaky, stays tagged
 

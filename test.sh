@@ -9,7 +9,14 @@ fi
 
 workspace_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 problem_id="$1"
-problem_dir="$workspace_dir/$problem_id"
+matched_dirs=("$workspace_dir/$problem_id" "$workspace_dir/$problem_id."*)
+problem_dir=""
+for d in "${matched_dirs[@]}"; do
+	if [[ -d "$d" ]]; then
+		problem_dir="$d"
+		break
+	fi
+done
 
 if [[ ! -d "$problem_dir" ]]; then
 	echo "Problem directory '$problem_dir' does not exist" >&2
@@ -88,13 +95,34 @@ for match in re.finditer(r'(?P<return>[A-Za-z_][A-Za-z0-9_:<>\*\&\s]*?)\s+(?P<na
 if not candidates:
 	raise SystemExit(f'Could not find any methods in {solution_path}')
 
+def split_params(param_str):
+	"""Splits C++ method parameters accurately respecting nested template angle brackets."""
+	params = []
+	current = []
+	depth = 0
+	for char in param_str:
+		if char == '<':
+			depth += 1
+			current.append(char)
+		elif char == '>':
+			depth -= 1
+			current.append(char)
+		elif char == ',' and depth == 0:
+			params.append("".join(current).strip())
+			current = []
+		else:
+			current.append(char)
+	if current:
+		params.append("".join(current).strip())
+	return [p for p in params if p]
+
 method_match = None
 parsed_params = []
 method_name = ""
 
 for candidate in candidates:
-	raw_params = [param.strip() for param in candidate.group('params').split(',') if param.strip()]
-	if not raw_params or not raw_params[0]:
+	raw_params = split_params(candidate.group('params'))
+	if not raw_params:
 		continue
 		
 	num_params = len(raw_params)
@@ -142,6 +170,33 @@ for candidate in candidates:
 		parsed_params = current_parsed
 		method_name = candidate.group('name')
 		break
+
+# Fallback: If no candidate passed strict heuristics, select the first method matching line length criteria
+if not method_match:
+	for candidate in candidates:
+		raw_params = split_params(candidate.group('params'))
+		if not raw_params:
+			continue
+		num_params = len(raw_params)
+		if len(lines) % num_params == 0:
+			current_parsed = []
+			valid_parse = True
+			for param_decl in raw_params:
+				p_name_match = re.search(r'([A-Za-z_][A-Za-z0-9_]*)\s*$', param_decl)
+				if not p_name_match:
+					valid_parse = False
+					break
+				p_name = p_name_match.group(1)
+				p_type = param_decl[:param_decl.rfind(p_name)].strip()
+				p_type = re.sub(r'^const\s+', '', p_type).strip()
+				if p_type.endswith('&'):
+					p_type = p_type[:-1].strip()
+				current_parsed.append({'name': p_name, 'type': p_type})
+			if valid_parse:
+				method_match = candidate
+				parsed_params = current_parsed
+				method_name = candidate.group('name')
+				break
 
 if not method_match:
 	raise SystemExit(f'Could not infer the correct target method matching the .tests.dat file in {solution_path}')

@@ -18,7 +18,7 @@ leetcode edit "$problem_id" -l cpp
 
 # 1.5 Capture ANY potential files generated in the root directory by leetcode-cli
 # (Matches files like <id>.cpp, <id>.<slug>.tests, <id>.test.dat, or literal test.dat)
-for file in "$problem_id".* *test*; do
+for file in "$problem_id".*; do
     if [[ -f "$file" && "$file" != "$0" ]]; then
         mv "$file" "$temp_dir/"
     fi
@@ -39,7 +39,7 @@ if ((${#solution_files[@]})); then
     link="https://leetcode.com/problems/$slug/"
     
     # Define folder name format: <problem_id>-<slug>
-    target_dir="${problem_id}-${slug}"
+    target_dir="${problem_id}.${slug}"
     if [[ "$temp_dir" != "$target_dir" ]]; then
         mv "$temp_dir" "$target_dir"
     fi

@@ -4,28 +4,27 @@
 - **Difficulty:** Medium   
 - **Rating:** <e.g. 1650>
 - **Date:** 2026-08-15
-- **Topic(s):** <e.g. Trees, Two Pointers>
-- **Pattern:** <one line — the reusable pattern this maps to, matches your topic-notes Pattern Catalog>
+- **Topic(s):** BST
+- **Pattern:** Check if in left tree, right tree, else must be the current root
 
 ---
 
 ## Attempt
 
-- [ ] Solved cold (no hints)
+- [x] Solved cold (no hints)
 - [ ] Solved with hints — stage reached: `10min stuck` / `Hint 1` / `Hint 2` / `Topic tag` / `Editorial title` / `Editorial intuition` / `Full solution`
 - [ ] Recognized the pattern immediately but implementation was slow
 - [ ] Knew the pattern, execution had bugs
 - Time to first working solution: <mm:ss>
 
 ## Approach
-
-<2-4 sentences, own words, the key insight — not a full walkthrough. This should read
-like one entry in your topic-notes Pattern Catalog.>
+- Compare current root against desired nodes -> stricktly smaller than smallest value between the two or stricktly larger than the largest of the two
+- Chose right/left subtree accordingly, else LCA must be the current root
 
 ## Complexity
 
-- Time: `O(...)`
-- Space: `O(...)`
+- Time: `O(H)`
+- Space: `O(1)`
 
 ## What I missed / got wrong
 

@@ -2,35 +2,42 @@
 
 - **Link:** https://leetcode.com/problems/letter-combinations-of-a-phone-number/
 - **Difficulty:** Medium   
-- **Rating:** 1600
-- **Date:** 2026-08-22
-- **Topic(s):** Recursion - Backtracking
-- **Pattern:** Backtracking map input to choice list and pass index of current choice
+- **Rating:** <e.g. 1650>
+- **Date:** 2026-09-02
+- **Topic(s):** <e.g. Trees, Two Pointers>
+- **Pattern:** <one line — the reusable pattern this maps to, matches your topic-notes Pattern Catalog>
 
 ---
 
 ## Attempt
 
-- [x] Solved cold (no hints)
+- [ ] Solved cold (no hints)
 - [ ] Solved with hints — stage reached: `10min stuck` / `Hint 1` / `Hint 2` / `Topic tag` / `Editorial title` / `Editorial intuition` / `Full solution`
 - [ ] Recognized the pattern immediately but implementation was slow
 - [ ] Knew the pattern, execution had bugs
-- Time to first working solution: 15:00
+- Time to first working solution: <mm:ss>
 
 ## Approach
-- Store the choices corresponding to each digit
-- For each digit try each choice
+
+<2-4 sentences, own words, the key insight — not a full walkthrough. This should read
+like one entry in your topic-notes Pattern Catalog.>
 
 ## Complexity
 
-- Time: `O(n * 4^n)`
-- Space: `O(n * 4^n)`
+- Time: `O(...)`
+- Space: `O(...)`
 
 ## What I missed / got wrong
-- Setting noexcept when unordered_map.at can throw an std::out_of_range
+
+<Be specific: wrong initial data structure, missed an edge case, misjudged complexity,
+froze on the observation step, clean logic but slow typing, etc. This is the line that
+actually earns you something on review — vague notes here are wasted effort.>
 
 ## What I'd do differently next time
-- Use arrays and string view instead of unordered map and vec to avoid using the heap
+
+<One or two concrete adjustments — a trigger phrase to add to Recognition Triggers,
+a variant to add to the Pattern Catalog, a habit to change (e.g. "write the invariant
+down before coding").>
 
 ## Review status
 

@@ -28,8 +28,7 @@
 - Space: `O(n^2)` (`O(1)` auxiliary as only keep track of 3 pointers + sorting space complexity)
 
 ## What I missed / got wrong
-First attempted cold after completing the list of study problems, i knew i had to fix one value and check ofther the rest however i didn't try sorting the array so i tried simple 2 sum + fixed however duplicate checking was the toughest for that approach and
-once i read about sorting first. I reviewed the solution yesterday, today i re-attempted and needed some hints since even though I new what i was doing my implementation had suble bugs.
+First attempted cold after completing the list of study problems, i knew i had to fix one value and check ofther the rest however i didn't try sorting the array so i tried simple 2 sum + fixed however duplicate checking was the toughest for that approach and once i read about sorting first. I reviewed the solution yesterday, today i re-attempted and needed some hints since even though I new what i was doing my implementation had suble bugs.
 
 ## What I'd do differently next time
 - Exploit sorting -> if solution time complexity greater than `O(nlogn)`, sort first and then use 2 pointers since sorted input is trigger for 2 pointers -> subproblem solvable in `O(n)`

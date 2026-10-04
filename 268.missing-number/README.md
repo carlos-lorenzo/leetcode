@@ -1,10 +1,10 @@
-# Problem 136
+# Problem 268
 
-- **Link:** https://leetcode.com/problems/single-number/
+- **Link:** https://leetcode.com/problems/missing-number/
 - **Difficulty:** Easy   
 - **Rating:** <e.g. 1650>
 - **Date:** 2026-10-04
-- **Topic(s):** Bit manipulation
+- **Topic(s):** Bit manipulation, XOR
 - **Pattern:** XOR checksum: XOR applied twice leaves value unchanged
 
 ---
@@ -15,10 +15,10 @@
 - [ ] Solved with hints — stage reached: `10min stuck` / `Hint 1` / `Hint 2` / `Topic tag` / `Editorial title` / `Editorial intuition` / `Full solution`
 - [ ] Recognized the pattern immediately but implementation was slow
 - [ ] Knew the pattern, execution had bugs
-- Time to first working solution: 01:00
+- Time to first working solution: 00:30
 
 ## Approach
-- XOR every number together, since same value XOR with itself returns 0, after XORing the value left is the only one that isn't duplicate
+- XOR every number in the list and from 0 to n together, since same value XOR with itself returns 0, after XORing the value left is the only one that isn't duplicate
 
 ## Complexity
 
